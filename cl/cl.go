@@ -18,6 +18,7 @@ package cl
 
 // #cgo linux pkg-config: OpenCL
 // #cgo darwin LDFLAGS: -framework OpenCL
+// #cgo windows LDFLAGS: -lOpenCL
 import "C"
 import "errors"
 
