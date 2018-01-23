@@ -1,8 +1,7 @@
-OpenCL bindings for Go
-======================
+# OpenCL bindings for Go
 
-Documentation at <http://godoc.org/github.com/samuel/go-opencl/cl>
+Documentation at <http://godoc.org/github.com/jgillich/go-opencl/cl>
 
 Can look at cl_test.go for an example of use.
 
-To get OpenCL 1.2 API build with the tag `cl12`
+By default, the OpenCL 1.2 API is exported. To get OpenCL 1.0, set the build tag `cl10`.

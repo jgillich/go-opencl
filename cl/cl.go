@@ -16,10 +16,10 @@ in the Go standard packages.
 */
 package cl
 
-// #include "cl.h"
+// #cgo linux pkg-config: OpenCL
 // #cgo darwin LDFLAGS: -framework OpenCL
 import "C"
 import "errors"
 
-// ErrUnsupported is the rror returned when some functionality is not support
+// ErrUnsupported is the error returned when some functionality is not supported
 var ErrUnsupported = errors.New("cl: unsupported")

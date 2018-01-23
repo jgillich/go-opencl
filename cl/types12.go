@@ -59,9 +59,12 @@ func (d ImageDescription) toCl() C.cl_image_desc {
 	desc.image_slice_pitch = C.size_t(d.SlicePitch)
 	desc.num_mip_levels = C.cl_uint(d.NumMipLevels)
 	desc.num_samples = C.cl_uint(d.NumSamples)
-	desc.buffer = nil
+
+	// TODO union type on intel
+	// desc.buffer = nil
 	if d.Buffer != nil {
-		desc.buffer = d.Buffer.clMem
+		// desc.buffer = d.Buffer.clMem
+		panic("unimplemented use of cl_image_desc buffer")
 	}
 	return desc
 }
