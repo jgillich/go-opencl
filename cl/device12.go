@@ -13,14 +13,12 @@ func init() {
 }
 
 func (d *Device) BuiltInKernels() string {
-	str, _ := d.getInfoString(C.CL_DEVICE_BUILT_IN_KERNELS, true)
-	return str
+	return d.mustGetInfoString(C.CL_DEVICE_BUILT_IN_KERNELS)
 }
 
 // Is CL_FALSE if the implementation does not have a linker available. Is CL_TRUE if the linker is available. This can be CL_FALSE for the embedded platform profile only. This must be CL_TRUE if CL_DEVICE_COMPILER_AVAILABLE is CL_TRUE
 func (d *Device) LinkerAvailable() bool {
-	val, _ := d.getInfoBool(C.CL_DEVICE_LINKER_AVAILABLE, true)
-	return val
+	return d.mustGetInfoBool(C.CL_DEVICE_LINKER_AVAILABLE)
 }
 
 func (d *Device) ParentDevice() *Device {
@@ -36,12 +34,10 @@ func (d *Device) ParentDevice() *Device {
 
 // Max number of pixels for a 1D image created from a buffer object. The minimum value is 65536 if CL_DEVICE_IMAGE_SUPPORT is CL_TRUE.
 func (d *Device) ImageMaxBufferSize() int {
-	val, _ := d.getInfoSize(C.CL_DEVICE_IMAGE_MAX_BUFFER_SIZE, true)
-	return int(val)
+	return int(d.mustGetInfoSize(C.CL_DEVICE_IMAGE_MAX_BUFFER_SIZE))
 }
 
 // Max number of images in a 1D or 2D image array. The minimum value is 2048 if CL_DEVICE_IMAGE_SUPPORT is CL_TRUE
 func (d *Device) ImageMaxArraySize() int {
-	val, _ := d.getInfoSize(C.CL_DEVICE_IMAGE_MAX_ARRAY_SIZE, true)
-	return int(val)
+	return int(d.mustGetInfoSize(C.CL_DEVICE_IMAGE_MAX_ARRAY_SIZE))
 }

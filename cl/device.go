@@ -117,315 +117,326 @@ func (d *Device) nullableId() C.cl_device_id {
 	return d.id
 }
 
-func (d *Device) getInfoString(param C.cl_device_info, panicOnError bool) (string, error) {
+func (d *Device) mustGetInfoString(param C.cl_device_info) string {
+	val, err := d.GetInfoString(param)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (d *Device) GetInfoString(param C.cl_device_info) (string, error) {
 	var strC [1024]C.char
 	var strN C.size_t
 	if err := C.clGetDeviceInfo(d.id, param, 1024, unsafe.Pointer(&strC), &strN); err != C.CL_SUCCESS {
-		if panicOnError {
-			panic("Should never fail")
-		}
 		return "", toError(err)
 	}
 	return C.GoString((*C.char)(unsafe.Pointer(&strC))), nil
 }
 
-func (d *Device) getInfoUint(param C.cl_device_info, panicOnError bool) (uint, error) {
+func (d *Device) mustGetInfoUint(param C.cl_device_info) uint {
+	val, err := d.GetInfoUint(param)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (d *Device) GetInfoUint(param C.cl_device_info) (uint, error) {
 	var val C.cl_uint
 	if err := C.clGetDeviceInfo(d.id, param, C.size_t(unsafe.Sizeof(val)), unsafe.Pointer(&val), nil); err != C.CL_SUCCESS {
-		if panicOnError {
-			panic("Should never fail")
-		}
 		return 0, toError(err)
 	}
 	return uint(val), nil
 }
 
-func (d *Device) getInfoSize(param C.cl_device_info, panicOnError bool) (int, error) {
+func (d *Device) mustGetInfoSize(param C.cl_device_info) int {
+	val, err := d.GetInfoSize(param)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (d *Device) GetInfoSize(param C.cl_device_info) (int, error) {
 	var val C.size_t
 	if err := C.clGetDeviceInfo(d.id, param, C.size_t(unsafe.Sizeof(val)), unsafe.Pointer(&val), nil); err != C.CL_SUCCESS {
-		if panicOnError {
-			panic("Should never fail")
-		}
 		return 0, toError(err)
 	}
 	return int(val), nil
 }
 
-func (d *Device) getInfoUlong(param C.cl_device_info, panicOnError bool) (int64, error) {
+func (d *Device) mustGetInfoUlong(param C.cl_device_info) int64 {
+	val, err := d.GetInfoUlong(param)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (d *Device) GetInfoUlong(param C.cl_device_info) (int64, error) {
 	var val C.cl_ulong
 	if err := C.clGetDeviceInfo(d.id, param, C.size_t(unsafe.Sizeof(val)), unsafe.Pointer(&val), nil); err != C.CL_SUCCESS {
-		if panicOnError {
-			panic("Should never fail")
-		}
 		return 0, toError(err)
 	}
 	return int64(val), nil
 }
 
-func (d *Device) getInfoBool(param C.cl_device_info, panicOnError bool) (bool, error) {
+func (d *Device) mustGetInfoBool(param C.cl_device_info) bool {
+	val, err := d.GetInfoBool(param)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (d *Device) GetInfoBool(param C.cl_device_info) (bool, error) {
 	var val C.cl_bool
 	if err := C.clGetDeviceInfo(d.id, param, C.size_t(unsafe.Sizeof(val)), unsafe.Pointer(&val), nil); err != C.CL_SUCCESS {
-		if panicOnError {
-			panic("Should never fail")
-		}
 		return false, toError(err)
 	}
 	return val == C.CL_TRUE, nil
 }
 
 func (d *Device) Name() string {
-	str, _ := d.getInfoString(C.CL_DEVICE_NAME, true)
-	return str
+	return d.mustGetInfoString(C.CL_DEVICE_NAME)
 }
 
 func (d *Device) Vendor() string {
-	str, _ := d.getInfoString(C.CL_DEVICE_VENDOR, true)
-	return str
+	return d.mustGetInfoString(C.CL_DEVICE_VENDOR)
 }
 
 func (d *Device) Extensions() string {
-	str, _ := d.getInfoString(C.CL_DEVICE_EXTENSIONS, true)
-	return str
+	return d.mustGetInfoString(C.CL_DEVICE_EXTENSIONS)
 }
 
 func (d *Device) OpenCLCVersion() string {
-	str, _ := d.getInfoString(C.CL_DEVICE_OPENCL_C_VERSION, true)
-	return str
+	return d.mustGetInfoString(C.CL_DEVICE_OPENCL_C_VERSION)
 }
 
 func (d *Device) Profile() string {
-	str, _ := d.getInfoString(C.CL_DEVICE_PROFILE, true)
-	return str
+	return d.mustGetInfoString(C.CL_DEVICE_PROFILE)
 }
 
 func (d *Device) Version() string {
-	str, _ := d.getInfoString(C.CL_DEVICE_VERSION, true)
-	return str
+	return d.mustGetInfoString(C.CL_DEVICE_VERSION)
 }
 
 func (d *Device) DriverVersion() string {
-	str, _ := d.getInfoString(C.CL_DRIVER_VERSION, true)
-	return str
+	return d.mustGetInfoString(C.CL_DRIVER_VERSION)
 }
 
 // The default compute device address space size specified as an
 // unsigned integer value in bits. Currently supported values are 32 or 64 bits.
 func (d *Device) AddressBits() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_ADDRESS_BITS, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_ADDRESS_BITS))
 }
 
 // Size of global memory cache line in bytes.
 func (d *Device) GlobalMemCachelineSize() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE))
 }
 
 // Maximum configured clock frequency of the device in MHz.
 func (d *Device) MaxClockFrequency() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_MAX_CLOCK_FREQUENCY, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_MAX_CLOCK_FREQUENCY))
 }
 
 // MaxComputeUnits returns the number of parallel compute units on the OpenCL device.
 // A work-group executes on a single compute unit. The minimum value is 1.
 func (d *Device) MaxComputeUnits() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_MAX_COMPUTE_UNITS, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_MAX_COMPUTE_UNITS))
 }
 
 // MaxConstantArgs returns the max number of arguments declared with the __constant qualifier in a kernel.
 // The minimum value is 8 for devices that are not of type CL_DEVICE_TYPE_CUSTOM.
 func (d *Device) MaxConstantArgs() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_MAX_CONSTANT_ARGS, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_MAX_CONSTANT_ARGS))
 }
 
 // MaxReadImageArgs returns the max number of simultaneous image objects that can be read by a kernel.
 // The minimum value is 128 if CL_DEVICE_IMAGE_SUPPORT is CL_TRUE.
 func (d *Device) MaxReadImageArgs() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_MAX_READ_IMAGE_ARGS, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_MAX_READ_IMAGE_ARGS))
 }
 
 // MaxSamplers returns the maximum number of samplers that can be used in a kernel. The minimum
 // value is 16 if CL_DEVICE_IMAGE_SUPPORT is CL_TRUE. (Also see sampler_t.)
 func (d *Device) MaxSamplers() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_MAX_SAMPLERS, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_MAX_SAMPLERS))
 }
 
 // MaxWorkItemDimensions returns the maximum dimensions that specify the global and local work-item IDs used
 // by the data parallel execution model. (Refer to clEnqueueNDRangeKernel).
 // The minimum value is 3 for devices that are not of type CL_DEVICE_TYPE_CUSTOM.
 func (d *Device) MaxWorkItemDimensions() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS))
 }
 
 // MaxWriteImageArgs returns the max number of simultaneous image objects that can be written to by a
 // kernel. The minimum value is 8 if CL_DEVICE_IMAGE_SUPPORT is CL_TRUE.
 func (d *Device) MaxWriteImageArgs() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_MAX_WRITE_IMAGE_ARGS, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_MAX_WRITE_IMAGE_ARGS))
 }
 
 // The minimum value is the size (in bits) of the largest OpenCL built-in
 // data type supported by the device (long16 in FULL profile, long16 or
 // int16 in EMBEDDED profile) for devices that are not of type CL_DEVICE_TYPE_CUSTOM.
 func (d *Device) MemBaseAddrAlign() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_MEM_BASE_ADDR_ALIGN, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_MEM_BASE_ADDR_ALIGN))
 }
 
 func (d *Device) NativeVectorWidthChar() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR))
 }
 
 func (d *Device) NativeVectorWidthShort() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT))
 }
 
 func (d *Device) NativeVectorWidthInt() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_INT))
 }
 
 func (d *Device) NativeVectorWidthLong() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG))
 }
 
 func (d *Device) NativeVectorWidthFloat() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT))
 }
 
 func (d *Device) NativeVectorWidthDouble() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE))
 }
 
 func (d *Device) NativeVectorWidthHalf() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, true)
-	return int(val)
+	return int(d.mustGetInfoUint(C.CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF))
+}
+
+func (d *Device) PreferredVectorWidthChar() int {
+	return int(d.mustGetInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR))
+}
+
+func (d *Device) PreferredVectorWidthShort() int {
+	return int(d.mustGetInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT))
+}
+
+func (d *Device) PreferredVectorWidthInt() int {
+	return int(d.mustGetInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT))
+}
+
+func (d *Device) PreferredVectorWidthLong() int {
+	return int(d.mustGetInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG))
+}
+
+func (d *Device) PreferredVectorWidthFloat() int {
+	return int(d.mustGetInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT))
+}
+
+func (d *Device) PreferredVectorWidthDouble() int {
+	return int(d.mustGetInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE))
+}
+
+func (d *Device) PreferredVectorWidthHalf() int {
+	return int(d.mustGetInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF))
 }
 
 // Image2DMaxHeight returns the max height of 2D image in pixels. The minimum value is 8192
 // if CL_DEVICE_IMAGE_SUPPORT is CL_TRUE.
 func (d *Device) Image2DMaxHeight() int {
-	val, _ := d.getInfoSize(C.CL_DEVICE_IMAGE2D_MAX_HEIGHT, true)
-	return int(val)
+	return int(d.mustGetInfoSize(C.CL_DEVICE_IMAGE2D_MAX_HEIGHT))
 }
 
 // Image2DMaxWidth returns the max width of 2D image or 1D image not created from a buffer object in
 // pixels. The minimum value is 8192 if CL_DEVICE_IMAGE_SUPPORT is CL_TRUE.
 func (d *Device) Image2DMaxWidth() int {
-	val, _ := d.getInfoSize(C.CL_DEVICE_IMAGE2D_MAX_WIDTH, true)
-	return int(val)
+	return int(d.mustGetInfoSize(C.CL_DEVICE_IMAGE2D_MAX_WIDTH))
 }
 
 // Image3DMaxDepth returns the max depth of 3D image in pixels. The minimum value is 2048 if CL_DEVICE_IMAGE_SUPPORT is CL_TRUE.
 func (d *Device) Image3DMaxDepth() int {
-	val, _ := d.getInfoSize(C.CL_DEVICE_IMAGE3D_MAX_DEPTH, true)
-	return int(val)
+	return int(d.mustGetInfoSize(C.CL_DEVICE_IMAGE3D_MAX_DEPTH))
 }
 
 // Image3DMaxHeight returns the max height of 3D image in pixels. The minimum value is 2048 if CL_DEVICE_IMAGE_SUPPORT is CL_TRUE.
 func (d *Device) Image3DMaxHeight() int {
-	val, _ := d.getInfoSize(C.CL_DEVICE_IMAGE3D_MAX_HEIGHT, true)
-	return int(val)
+	return int(d.mustGetInfoSize(C.CL_DEVICE_IMAGE3D_MAX_HEIGHT))
 }
 
 // Image3DMaxWidth returns the max width of 3D image in pixels. The minimum value is 2048 if CL_DEVICE_IMAGE_SUPPORT is CL_TRUE.
 func (d *Device) Image3DMaxWidth() int {
-	val, _ := d.getInfoSize(C.CL_DEVICE_IMAGE3D_MAX_WIDTH, true)
-	return int(val)
+	return int(d.mustGetInfoSize(C.CL_DEVICE_IMAGE3D_MAX_WIDTH))
 }
 
 // MaxParameterSize returns the max size in bytes of the arguments that can be passed to a kernel. The
 // minimum value is 1024 for devices that are not of type CL_DEVICE_TYPE_CUSTOM.
 // For this minimum value, only a maximum of 128 arguments can be passed to a kernel.
 func (d *Device) MaxParameterSize() int {
-	val, _ := d.getInfoSize(C.CL_DEVICE_MAX_PARAMETER_SIZE, true)
-	return int(val)
+	return int(d.mustGetInfoSize(C.CL_DEVICE_MAX_PARAMETER_SIZE))
 }
 
 // MaxWorkGroupSize returns the maximum number of work-items in a work-group executing a kernel on a
 // single compute unit, using the data parallel execution model. (Refer
 // to clEnqueueNDRangeKernel). The minimum value is 1.
 func (d *Device) MaxWorkGroupSize() int {
-	val, _ := d.getInfoSize(C.CL_DEVICE_MAX_WORK_GROUP_SIZE, true)
-	return int(val)
+	return int(d.mustGetInfoSize(C.CL_DEVICE_MAX_WORK_GROUP_SIZE))
 }
 
 // ProfilingTimerResolution describes the resolution of device timer. This is measured in nanoseconds.
 func (d *Device) ProfilingTimerResolution() int {
-	val, _ := d.getInfoSize(C.CL_DEVICE_PROFILING_TIMER_RESOLUTION, true)
-	return int(val)
+	return int(d.mustGetInfoSize(C.CL_DEVICE_PROFILING_TIMER_RESOLUTION))
 }
 
 // LocalMemSize returns the size of local memory arena in bytes. The minimum value is 32 KB for
 // devices that are not of type CL_DEVICE_TYPE_CUSTOM.
 func (d *Device) LocalMemSize() int64 {
-	val, _ := d.getInfoUlong(C.CL_DEVICE_LOCAL_MEM_SIZE, true)
-	return val
+	return d.mustGetInfoUlong(C.CL_DEVICE_LOCAL_MEM_SIZE)
 }
 
 // MaxConstantBufferSize returns the max size in bytes of a constant buffer allocation. The minimum value is
 // 64 KB for devices that are not of type CL_DEVICE_TYPE_CUSTOM.
 func (d *Device) MaxConstantBufferSize() int64 {
-	val, _ := d.getInfoUlong(C.CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, true)
-	return val
+	return d.mustGetInfoUlong(C.CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE)
 }
 
 // MaxMemAllocSize returns the max size of memory object allocation in bytes. The minimum value is max
 // (1/4th of CL_DEVICE_GLOBAL_MEM_SIZE, 128*1024*1024) for devices that are
 // not of type CL_DEVICE_TYPE_CUSTOM.
 func (d *Device) MaxMemAllocSize() int64 {
-	val, _ := d.getInfoUlong(C.CL_DEVICE_MAX_MEM_ALLOC_SIZE, true)
-	return val
+	return d.mustGetInfoUlong(C.CL_DEVICE_MAX_MEM_ALLOC_SIZE)
 }
 
 // Size of global device memory in bytes.
 func (d *Device) GlobalMemSize() int64 {
-	val, _ := d.getInfoUlong(C.CL_DEVICE_GLOBAL_MEM_SIZE, true)
-	return val
+	return d.mustGetInfoUlong(C.CL_DEVICE_GLOBAL_MEM_SIZE)
 }
 
 func (d *Device) Available() bool {
-	val, _ := d.getInfoBool(C.CL_DEVICE_AVAILABLE, true)
-	return val
+	return d.mustGetInfoBool(C.CL_DEVICE_AVAILABLE)
 }
 
 func (d *Device) CompilerAvailable() bool {
-	val, _ := d.getInfoBool(C.CL_DEVICE_COMPILER_AVAILABLE, true)
-	return val
+	return d.mustGetInfoBool(C.CL_DEVICE_COMPILER_AVAILABLE)
 }
 
 func (d *Device) EndianLittle() bool {
-	val, _ := d.getInfoBool(C.CL_DEVICE_ENDIAN_LITTLE, true)
-	return val
+	return d.mustGetInfoBool(C.CL_DEVICE_ENDIAN_LITTLE)
 }
 
 // Is CL_TRUE if the device implements error correction for all
 // accesses to compute device memory (global and constant). Is
 // CL_FALSE if the device does not implement such error correction.
 func (d *Device) ErrorCorrectionSupport() bool {
-	val, _ := d.getInfoBool(C.CL_DEVICE_ERROR_CORRECTION_SUPPORT, true)
-	return val
+	return d.mustGetInfoBool(C.CL_DEVICE_ERROR_CORRECTION_SUPPORT)
 }
 
 func (d *Device) HostUnifiedMemory() bool {
-	val, _ := d.getInfoBool(C.CL_DEVICE_HOST_UNIFIED_MEMORY, true)
-	return val
+	return d.mustGetInfoBool(C.CL_DEVICE_HOST_UNIFIED_MEMORY)
 }
 
 func (d *Device) ImageSupport() bool {
-	val, _ := d.getInfoBool(C.CL_DEVICE_IMAGE_SUPPORT, true)
-	return val
+	return d.mustGetInfoBool(C.CL_DEVICE_IMAGE_SUPPORT)
 }
 
 func (d *Device) Type() DeviceType {
@@ -483,8 +494,7 @@ func (d *Device) GlobalMemCacheType() MemCacheType {
 }
 
 func (d *Device) GlobalMemCacheSize() int {
-	val, _ := d.getInfoUlong(C.CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, true)
-	return int(val)
+	return int(d.mustGetInfoUlong(C.CL_DEVICE_GLOBAL_MEM_CACHE_SIZE))
 }
 
 // MaxWorkItemSizes returns the maximum number of work-items that can be specified in each dimension of the work-group to clEnqueueNDRangeKernel.
@@ -503,39 +513,4 @@ func (d *Device) MaxWorkItemSizes() []int {
 		intSizes[i] = int(s)
 	}
 	return intSizes
-}
-
-func (d *Device) PreferredVectorWidthChar() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, true)
-	return int(val)
-}
-
-func (d *Device) PreferredVectorWidthShort() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, true)
-	return int(val)
-}
-
-func (d *Device) PreferredVectorWidthInt() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, true)
-	return int(val)
-}
-
-func (d *Device) PreferredVectorWidthLong() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, true)
-	return int(val)
-}
-
-func (d *Device) PreferredVectorWidthFloat() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, true)
-	return int(val)
-}
-
-func (d *Device) PreferredVectorWidthDouble() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, true)
-	return int(val)
-}
-
-func (d *Device) PreferredVectorWidthHalf() int {
-	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, true)
-	return int(val)
 }
