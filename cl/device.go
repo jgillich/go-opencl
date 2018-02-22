@@ -482,6 +482,11 @@ func (d *Device) GlobalMemCacheType() MemCacheType {
 	return MemCacheType(memType)
 }
 
+func (d *Device) GlobalMemCacheSize() int {
+	val, _ := d.getInfoUlong(C.CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, true)
+	return int(val)
+}
+
 // MaxWorkItemSizes returns the maximum number of work-items that can be specified in each dimension of the work-group to clEnqueueNDRangeKernel.
 //
 // Returns n size_t entries, where n is the value returned by the query for CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS.
