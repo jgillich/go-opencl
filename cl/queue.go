@@ -169,3 +169,13 @@ func (q *CommandQueue) EnqueueWriteImage(image *MemObject, blocking bool, origin
 	err := toError(C.clEnqueueWriteImage(q.clQueue, image.clMem, clBool(blocking), &cOrigin[0], &cRegion[0], C.size_t(rowPitch), C.size_t(slicePitch), unsafe.Pointer(&data[0]), C.cl_uint(len(eventWaitList)), eventListPtr(eventWaitList), &event))
 	return newEvent(event), err
 }
+
+// EnqueueTask enqueues a task to execute a kernel on a device.
+// The kernel is executed using a single work-item. EnqueueTask is equivalent
+// to calling EnqueueNDRangeKernel with globalWorkOffset = 0,
+// globalWorkSize[0] set to 1, and localWorkSize[0] set to 1.
+func (q *CommandQueue) EnqueueTask(kernel *Kernel, eventWaitList []*Event) (*Event, error) {
+	var event C.cl_event
+	err := toError(C.clEnqueueTask(q.clQueue, kernel.clKernel, C.cl_uint(len(eventWaitList)), eventListPtr(eventWaitList), &event))
+	return newEvent(event), err
+}
