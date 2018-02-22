@@ -499,3 +499,38 @@ func (d *Device) MaxWorkItemSizes() []int {
 	}
 	return intSizes
 }
+
+func (d *Device) PreferredVectorWidthChar() int {
+	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, true)
+	return int(val)
+}
+
+func (d *Device) PreferredVectorWidthShort() int {
+	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, true)
+	return int(val)
+}
+
+func (d *Device) PreferredVectorWidthInt() int {
+	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, true)
+	return int(val)
+}
+
+func (d *Device) PreferredVectorWidthLong() int {
+	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, true)
+	return int(val)
+}
+
+func (d *Device) PreferredVectorWidthFloat() int {
+	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, true)
+	return int(val)
+}
+
+func (d *Device) PreferredVectorWidthDouble() int {
+	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, true)
+	return int(val)
+}
+
+func (d *Device) PreferredVectorWidthHalf() int {
+	val, _ := d.getInfoUint(C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, true)
+	return int(val)
+}
