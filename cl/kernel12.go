@@ -12,5 +12,5 @@ func (k *Kernel) ArgName(index int) (string, error) {
 	if err := C.clGetKernelArgInfo(k.clKernel, C.cl_uint(index), C.CL_KERNEL_ARG_NAME, 1024, unsafe.Pointer(&strC[0]), &strN); err != C.CL_SUCCESS {
 		return "", toError(err)
 	}
-	return string(strC[:strN]), nil
+	return C.GoStringN((*C.char)(unsafe.Pointer(&strC)), C.int(strN)), nil
 }
