@@ -126,7 +126,7 @@ func (d *Device) getInfoString(param C.cl_device_info, panicOnError bool) (strin
 		}
 		return "", toError(err)
 	}
-	return C.GoStringN((*C.char)(unsafe.Pointer(&strC)), C.int(strN)), nil
+	return C.GoString((*C.char)(unsafe.Pointer(&strC))), nil
 }
 
 func (d *Device) getInfoUint(param C.cl_device_info, panicOnError bool) (uint, error) {
